@@ -43,16 +43,28 @@ async def generate_image(
 
     seed = str(random.randint(0, 1000000000))
 
-    url: str = f"{config.api.image_gen_endpoint}/{prompt}"
-    url += "" if cached else f"?seed={seed}"
-    url += f"&width={width}"
-    url += f"&height={height}"
-    url += f"&model={model}" if model else ""
-    url += f"&safe={safe}" if safe else ""
-    url += f"&nologo={nologo}" if nologo else ""
-    url += f"&enhance={enhance}" if enhance else ""
-    url += f"&nofeed={private}" if private else ""
-    url += f"&referer={config.image_generation.referer}"
+    url: str = f"{config.api.image_gen_endpoint}/{quote(prompt, safe='')}"
+    
+    # Build query parameters properly
+    params = []
+    if not cached:
+        params.append(f"seed={seed}")
+    params.append(f"width={width}")
+    params.append(f"height={height}")
+    if model:
+        params.append(f"model={model}")
+    if safe:
+        params.append(f"safe={safe}")
+    if nologo:
+        params.append(f"nologo={nologo}")
+    if enhance:
+        params.append(f"enhance={enhance}")
+    if private:
+        params.append(f"nofeed={private}")
+    params.append(f"referer={config.image_generation.referer}")
+    
+    if params:
+        url += "?" + "&".join(params)
 
     dic = {
         "prompt": prompt,
@@ -63,7 +75,7 @@ async def generate_image(
         "cached": cached,
         "nologo": nologo,
         "enhance": enhance,
-        "url": quote(url, safe=":/&=?"),
+        "url": url,
     }
 
     dic["seed"] = None if cached else seed
@@ -84,6 +96,7 @@ async def generate_image(
                 elif response.status == 429:
                     raise APIError(config.ui.error_messages["rate_limit"])
                 elif response.status == 404:
+                    logger.error(f"Resource not found. URL: {url}")
                     raise APIError(config.ui.error_messages["resource_not_found"])
                 elif response.status != 200:
                     raise APIError(
