@@ -63,7 +63,7 @@ async def generate_image(
     dic["seed"] = None if cached else seed
 
     headers = {
-        "Authorization": f"Bearer {os.getenv('ENTER_TOKEN_ELIXPO')}",
+        "Authorization": f"Bearer {os.getenv('ENTER_TOKEN')}",
     }
 
     try:
