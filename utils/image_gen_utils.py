@@ -9,6 +9,7 @@ from PIL import Image
 from exceptions import PromptTooLongError, DimensionTooSmallError, APIError
 from config import config
 
+
 __all__: list[str] = ("generate_image", "validate_prompt", "validate_dimensions")
 
 
@@ -43,29 +44,8 @@ async def generate_image(
 
     seed = str(random.randint(0, 1000000000))
 
-    url: str = f"{config.api.image_gen_endpoint}/{quote(prompt, safe='')}"
-    
-    # Build query parameters properly
-    params = []
-    if not cached:
-        params.append(f"seed={seed}")
-    params.append(f"width={width}")
-    params.append(f"height={height}")
-    if model:
-        params.append(f"model={model}")
-    if safe:
-        params.append(f"safe={safe}")
-    if nologo:
-        params.append(f"nologo={nologo}")
-    if enhance:
-        params.append(f"enhance={enhance}")
-    if private:
-        params.append(f"nofeed={private}")
-    params.append(f"referer={config.image_generation.referer}")
-    
-    if params:
-        url += "?" + "&".join(params)
-
+    # Remove trailing slash from endpoint if present, then construct URL properly
+    url: str = f"https://enter.pollinations.ai/api/generate/image/{quote(prompt)}?seed={seed}&width={width}&height={height}&model={model}&safe={str(safe).lower()}&nologo={str(nologo).lower()}&enhance={str(enhance).lower()}&nofeed={str(private).lower()}&referer={quote(config.image_generation.referer)}"
     dic = {
         "prompt": prompt,
         "width": width,
