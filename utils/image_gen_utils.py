@@ -8,7 +8,9 @@ import json
 from PIL import Image
 from exceptions import PromptTooLongError, DimensionTooSmallError, APIError
 from config import config
-
+import os 
+from dotenv import load_dotenv
+load_dotenv()
 
 __all__: list[str] = ("generate_image", "validate_prompt", "validate_dimensions")
 
@@ -61,7 +63,7 @@ async def generate_image(
     dic["seed"] = None if cached else seed
 
     headers = {
-        "Authorization": f"Bearer {config.api.api_key}",
+        "Authorization": f"Bearer {os.getenv('ENTER_TOKEN_ELIXPO')}",
     }
 
     try:
