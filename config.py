@@ -165,29 +165,28 @@ def load_config(path: str = "config.toml") -> Config:
 
     return Config(**config_data)
 
-
 async def initialize_models_async(config_instance: Config) -> List[str]:
-    """Asynchronously initialize models list by fetching from the API"""
     try:
         async with aiohttp.ClientSession() as session:
             async with session.get(
                 config_instance.api.models_list_endpoint
             ) as response:
                 if response.ok:
-                    return await response.json()
+                    models = await response.json()
+                    return [model['name'] if isinstance(model, dict) else model for model in models]
     except Exception as e:
         logger.error(f"Error pre-initializing models: {e}")
     return [config_instance.image_generation.fallback_model]
 
 
 def initialize_models(config_instance: Config) -> List[str]:
-    """Pre-initialize models list by fetching from the API (synchronous fallback)"""
     import requests
 
     try:
         response = requests.get(config_instance.api.models_list_endpoint)
         if response.ok:
-            return response.json()
+            models = response.json()
+            return [model['name'] if isinstance(model, dict) else model for model in models]
     except Exception as e:
         print(f"Error pre-initializing models: {e}", file=sys.stderr)
     return [config_instance.image_generation.fallback_model]

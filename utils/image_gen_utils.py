@@ -32,7 +32,7 @@ async def generate_image(
     prompt: str = None,
     width: int = config.image_generation.defaults.width,
     height: int = config.image_generation.defaults.height,
-    model: str = config.MODELS[0],
+    model: str = None,  # Don't use config.MODELS[0] as default
     safe: bool = config.image_generation.defaults.safe,
     cached: bool = config.image_generation.defaults.cached,
     nologo: bool = config.image_generation.defaults.nologo,
@@ -41,15 +41,15 @@ async def generate_image(
     **kwargs,
 ):
     if not model:
-        model = "zimage"
-    logger.info(
-        f"Generating image with prompt: {prompt}, width: {width}, height: {height}, safe: {safe}, cached: {cached}, nologo: {nologo}, enhance: {enhance}, model: {model}"
-    )
+        if config.MODELS:
+            model = config.MODELS[0]
+        else:
+            model = config.image_generation.fallback_model
 
     seed = str(random.randint(0, 1000000000))
 
     # Remove trailing slash from endpoint if present, then construct URL properly
-    url: str = f"https://enter.pollinations.ai/api/generate/image/{quote(prompt)}?seed={seed}&width={width}&height={height}&model={model}&safe={str(safe).lower()}&nologo={str(nologo).lower()}&enhance={str(enhance).lower()}&nofeed={str(private).lower()}&referer={quote(config.image_generation.referer)}"
+    url: str = f"https://gen.pollinations.ai/image/{quote(prompt)}?seed={seed}&width={width}&height={height}&model={model}&safe={str(safe).lower()}&nologo={str(nologo).lower()}&enhance={str(enhance).lower()}&nofeed={str(private).lower()}&referer={quote(config.image_generation.referer)}"
     dic = {
         "prompt": prompt,
         "width": width,

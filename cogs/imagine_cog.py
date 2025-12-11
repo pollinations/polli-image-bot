@@ -372,6 +372,9 @@ class Imagine(commands.Cog):
         except Exception:
             pass
 
+        if not model and config.MODELS:
+            model = config.MODELS[0]
+
         start: datetime.datetime = datetime.datetime.now()
         discord_logger.log_image_generation(
             action="generate_start",
