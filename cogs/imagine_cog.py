@@ -328,7 +328,11 @@ class Imagine(commands.Cog):
     @app_commands.command(name="pollinate", description="Generate AI Images")
     @app_commands.choices(
         model=[
-            app_commands.Choice(name=choice, value=choice) for choice in config.MODELS
+            app_commands.Choice(
+                name=choice if isinstance(choice, str) else choice.get('name', str(choice)),
+                value=choice if isinstance(choice, str) else choice.get('name', str(choice))
+            )
+            for choice in config.MODELS
         ],
     )
     @app_commands.guild_only()
