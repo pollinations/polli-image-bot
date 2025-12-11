@@ -47,8 +47,6 @@ async def generate_image(
             model = config.image_generation.fallback_model
 
     seed = str(random.randint(0, 1000000000))
-
-    # Remove trailing slash from endpoint if present, then construct URL properly
     url: str = f"https://gen.pollinations.ai/image/{quote(prompt)}?seed={seed}&width={width}&height={height}&model={model}&safe={str(safe).lower()}&nologo={str(nologo).lower()}&enhance={str(enhance).lower()}&nofeed={str(private).lower()}&referer={quote(config.image_generation.referer)}"
     dic = {
         "prompt": prompt,
@@ -124,7 +122,6 @@ async def generate_image(
 
 
 async def _extract_user_comment_async(image_bytes):
-    """Extract user comment from image EXIF data asynchronously"""
     loop = asyncio.get_event_loop()
 
     def _extract_sync():
@@ -141,19 +138,4 @@ async def _extract_user_comment_async(image_bytes):
             logger.exception("Error extracting user comment from image EXIF data")
             return {"has_nsfw_concept": False, "prompt": ""}
 
-    # Run the CPU-intensive PIL operation in a thread pool
     return await loop.run_in_executor(None, _extract_sync)
-
-
-def _extract_user_comment(image_bytes):
-    """Synchronous fallback for extracting user comment (deprecated)"""
-    image = Image.open(io.BytesIO(image_bytes))
-
-    try:
-        exif = image.info["exif"].decode("latin-1", errors="ignore")
-        user_comment = json.loads(exif[exif.find("{") : exif.rfind("}") + 1])
-    except Exception:
-        logger.exception("Error extracting user comment from image EXIF data")
-        return "No user comment found."
-
-    return user_comment if user_comment else "No user comment found."
