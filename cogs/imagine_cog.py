@@ -353,7 +353,7 @@ class Imagine(commands.Cog):
         prompt: str,
         width: int = config.commands["pollinate"].default_width,
         height: int = config.commands["pollinate"].default_height,
-        model: app_commands.Choice[str] = config.MODELS[0],
+        model: app_commands.Choice[str] = None,
         enhance: bool | None = config.image_generation.defaults.enhance,
         safe: bool = config.image_generation.defaults.safe,
         cached: bool = config.image_generation.defaults.cached,

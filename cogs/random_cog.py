@@ -50,7 +50,7 @@ class RandomImage(commands.Cog):
         interaction: discord.Interaction,
         width: int = config.commands["random"].default_width,
         height: int = config.commands["random"].default_height,
-        model: app_commands.Choice[str] = config.MODELS[0],
+        model: app_commands.Choice[str] = None,
         negative: str | None = None,
         nologo: bool = config.image_generation.defaults.nologo,
         private: bool = config.image_generation.defaults.private,
