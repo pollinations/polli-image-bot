@@ -64,7 +64,7 @@ class RandomImage(commands.Cog):
         await interaction.response.defer(thinking=True, ephemeral=private)
 
         try:
-            model = model.value if model else None
+            model = model.value if model else "zimage"
         except Exception:
             pass
 

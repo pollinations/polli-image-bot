@@ -40,6 +40,8 @@ async def generate_image(
     private: bool = config.image_generation.defaults.private,
     **kwargs,
 ):
+    if not model:
+        model = "zimage"
     logger.info(
         f"Generating image with prompt: {prompt}, width: {width}, height: {height}, safe: {safe}, cached: {cached}, nologo: {nologo}, enhance: {enhance}, model: {model}"
     )
