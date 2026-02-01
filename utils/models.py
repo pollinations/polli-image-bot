@@ -2,6 +2,9 @@ from config import initialize_models_async
 from utils.logger import discord_logger
 
 
+ALLOWED_MODELS = {"flux", "klein", "klein-large", "zimage"}
+
+
 async def fetch_and_log_models(config, action: str) -> None:
     """
     Fetch models from API and update config with proper logging.
@@ -14,15 +17,18 @@ async def fetch_and_log_models(config, action: str) -> None:
         # Fetch new models from API
         models = await initialize_models_async(config)
 
+        # Filter to only allowed models
+        filtered_models = [model for model in models if model in ALLOWED_MODELS]
+
         # Update config with new models (clear and extend to maintain reference)
         config.MODELS.clear()
-        config.MODELS.extend(models)
+        config.MODELS.extend(filtered_models if filtered_models else [config.image_generation.fallback_model])
 
         # Log successful operation
         discord_logger.log_bot_event(
             action=action,
             status="success",
-            details=f"Models {action.replace('_', ' ')}: {models}",
+            details=f"Models {action.replace('_', ' ')}: {filtered_models}",
         )
 
     except Exception as e:
