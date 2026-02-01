@@ -115,8 +115,6 @@ class ImagineButtonView(discord.ui.View):
             return
 
         image_file = discord.File(image, filename="image.png")
-        if dic["nsfw"]:
-            image_file.filename = f"SPOILER_{image_file.filename}"
         time_taken_delta: datetime.timedelta = datetime.datetime.now() - start
 
         embed: SafeEmbed = await generate_pollinate_embed(
@@ -386,7 +384,12 @@ class Imagine(commands.Cog):
         )
         try:
             dic, image = await generate_image(
-                prompt, width, height, model, safe, cached, nologo, enhance, private
+                prompt=prompt,
+                width=width,
+                height=height,
+                model=model,
+                safe=safe,
+                enhance=enhance,
             )
             time_taken = (datetime.datetime.now() - start).total_seconds()
             discord_logger.log_image_generation(

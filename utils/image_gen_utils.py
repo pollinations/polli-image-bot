@@ -42,10 +42,7 @@ async def generate_image(
     height: int = config.image_generation.defaults.height,
     model: str = None,  # Don't use config.MODELS[0] as default
     safe: bool = config.image_generation.defaults.safe,
-    cached: bool = config.image_generation.defaults.cached,
-    nologo: bool = config.image_generation.defaults.nologo,
     enhance: bool = config.image_generation.defaults.enhance,
-    private: bool = config.image_generation.defaults.private,
     seed: int = random.randint(0, 2**31 - 1),
     **kwargs,
 ):
@@ -56,20 +53,17 @@ async def generate_image(
             model = config.image_generation.fallback_model
 
     validate_model(model)
-    url: str = f"https://gen.pollinations.ai/image/{quote(prompt)}?seed={seed}&width={width}&height={height}&model={model}&safe={str(safe).lower()}&nologo={str(nologo).lower()}&enhance={str(enhance).lower()}&nofeed={str(private).lower()}&referer={quote(config.image_generation.referer)}"
+    url: str = f"https://gen.pollinations.ai/image/{quote(prompt)}?seed={seed}&width={width}&height={height}&model={model}&safe={str(safe).lower()}&enhance={str(enhance).lower()}"
+
     dic = {
         "prompt": prompt,
         "width": width,
         "height": height,
         "model": model,
         "safe": safe,
-        "cached": cached,
-        "nologo": nologo,
-        "enhance": enhance,
         "url": url,
+        "seed": seed,
     }
-
-    dic["seed"] = None if cached else seed
 
     headers = {
         "Authorization": f"Bearer {os.getenv('ENTER_TOKEN')}",
@@ -109,19 +103,6 @@ async def generate_image(
 
                 try:
                     dic["nsfw"] = user_comment["has_nsfw_concept"]
-                    if (
-                        enhance
-                        or len(prompt)
-                        < config.image_generation.validation.max_enhanced_prompt_length
-                    ):
-                        enhance_prompt = user_comment["prompt"]
-                        if enhance_prompt == prompt:
-                            dic["enhanced_prompt"] = None
-                        else:
-                            enhance_prompt = enhance_prompt[
-                                : enhance_prompt.rfind("\n")
-                            ].strip()
-                            dic["enhanced_prompt"] = enhance_prompt
                 except Exception:
                     dic["nsfw"] = False
 
