@@ -12,7 +12,9 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
-__all__: list[str] = ("generate_image", "validate_prompt", "validate_dimensions")
+__all__: list[str] = ("generate_image", "validate_prompt", "validate_dimensions", "validate_model")
+
+ALLOWED_MODELS = {"flux", "klein", "klein-large", "zimage"}
 
 
 def validate_prompt(prompt) -> None:
@@ -28,6 +30,14 @@ def validate_dimensions(width, height) -> None:
         raise DimensionTooSmallError(config.ui.error_messages["dimension_too_small"])
 
 
+def validate_model(model: str) -> None:
+    if model not in ALLOWED_MODELS:
+        allowed = ", ".join(sorted(ALLOWED_MODELS))
+        raise APIError(
+            f"Model '{model}' is not allowed. Only the following models are supported by this bot: {allowed}"
+        )
+
+
 async def generate_image(
     prompt: str = None,
     width: int = config.image_generation.defaults.width,
@@ -38,6 +48,7 @@ async def generate_image(
     nologo: bool = config.image_generation.defaults.nologo,
     enhance: bool = config.image_generation.defaults.enhance,
     private: bool = config.image_generation.defaults.private,
+    seed: int = random.randint(0, 2**31 - 1),
     **kwargs,
 ):
     if not model:
@@ -46,7 +57,7 @@ async def generate_image(
         else:
             model = config.image_generation.fallback_model
 
-    seed = str(random.randint(0, 1000000000))
+    validate_model(model)
     url: str = f"https://gen.pollinations.ai/image/{quote(prompt)}?seed={seed}&width={width}&height={height}&model={model}&safe={str(safe).lower()}&nologo={str(nologo).lower()}&enhance={str(enhance).lower()}&nofeed={str(private).lower()}&referer={quote(config.image_generation.referer)}"
     dic = {
         "prompt": prompt,
