@@ -7,14 +7,12 @@ from urllib.parse import quote
 import json
 from PIL import Image
 from exceptions import PromptTooLongError, DimensionTooSmallError, APIError
-from config import config
+from config import config, ALLOWED_MODELS
 import os 
 from dotenv import load_dotenv
 load_dotenv()
 
 __all__: list[str] = ("generate_image", "validate_prompt", "validate_dimensions", "validate_model")
-
-ALLOWED_MODELS = {"flux", "klein", "klein-large", "zimage"}
 
 
 def validate_prompt(prompt) -> None:

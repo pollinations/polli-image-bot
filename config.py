@@ -12,6 +12,9 @@ from dotenv import load_dotenv
 
 load_dotenv(override=True)
 
+# Allowed image generation models
+ALLOWED_MODELS = {"flux", "klein", "klein-large", "zimage"}
+
 
 class BotConfig(BaseModel):
     command_prefix: str

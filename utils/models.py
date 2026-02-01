@@ -1,8 +1,5 @@
-from config import initialize_models_async
+from config import initialize_models_async, ALLOWED_MODELS
 from utils.logger import discord_logger
-
-
-ALLOWED_MODELS = {"flux", "klein", "klein-large", "zimage"}
 
 
 async def fetch_and_log_models(config, action: str) -> None:
