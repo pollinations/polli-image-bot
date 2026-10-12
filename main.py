@@ -65,12 +65,10 @@ commands_: dict[str, str] = {
 
 class pollinationsBot(commands.Bot):
     def __init__(self) -> None:
-        intents: discord.Intents = discord.Intents.default()
-        intents.messages = True
-        intents.message_content = True
-
         super().__init__(
-            command_prefix=config.bot.command_prefix, intents=intents, help_command=None
+            command_prefix=commands.when_mentioned_or(config.bot.command_prefix),
+            intents=discord.Intents.default(),
+            help_command=None,
         )
         self.synced = False
 
